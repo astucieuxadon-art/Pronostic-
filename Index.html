@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pronostic Analytics — Analyse sportive quotidienne</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">Pronostic<span>Analytics</span></div>
+    <nav id="auth-nav">
+      <button id="btn-login" class="btn-ghost">Se connecter</button>
+      <button id="btn-signup" class="btn-solid">Créer un compte</button>
+      <div id="user-box" class="hidden">
+        <span id="user-email"></span>
+        <button id="btn-logout" class="btn-ghost">Déconnexion</button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <section class="hero">
+    <div class="hero-inner">
+      <p class="hero-kicker">Combiné du jour — <span id="hero-date"></span></p>
+      <h1 class="hero-odds" id="hero-odds">—</h1>
+      <p class="hero-sub">Cote combinée estimée à partir des probabilités calculées ci-dessous</p>
+      <div class="hero-disclaimer">
+        Ces chiffres sont des <strong>estimations statistiques</strong>, pas des garanties.
+        Le sport reste imprévisible : ne mise que ce que tu peux te permettre de perdre.
+      </div>
+    </div>
+  </section>
+
+  <section class="paywall" id="paywall">
+    <div class="paywall-card">
+      <h2>Accès complet</h2>
+      <p>Débloque le combiné détaillé, l'historique de fiabilité du modèle et l'analyse de chaque match.</p>
+      <div class="price"><span>2 000</span> FCFA / mois</div>
+      <div class="pay-methods">
+        <button class="btn-pay" data-method="orange">Payer avec Orange Money</button>
+        <button class="btn-pay" data-method="mtn">Payer avec MTN Mobile Money</button>
+      </div>
+      <p class="pay-note" id="pay-status"></p>
+    </div>
+  </section>
+
+  <section class="matches" id="matches-section">
+    <div class="section-head">
+      <h2>Matchs analysés aujourd'hui</h2>
+      <p class="muted">Toutes compétitions confondues — sélection basée sur la confiance du modèle</p>
+    </div>
+    <div class="ticket" id="matches-list">
+      <p class="loading">Chargement des matchs…</p>
+    </div>
+  </section>
+
+  <section class="reliability">
+    <div class="section-head">
+      <h2>Fiabilité du modèle</h2>
+      <p class="muted">Sur les 30 derniers jours — mis à jour automatiquement, rien n'est caché</p>
+    </div>
+    <div class="reliability-grid" id="reliability-grid">
+      <div class="stat-block"><span class="stat-num" id="stat-hitrate">—</span><span class="stat-label">Taux de réussite simple</span></div>
+      <div class="stat-block"><span class="stat-num" id="stat-combo">—</span><span class="stat-label">Taux de réussite combiné</span></div>
+      <div class="stat-block"><span class="stat-num" id="stat-count">—</span><span class="stat-label">Matchs analysés</span></div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p>PronosticAnalytics fournit une analyse statistique à titre informatif. Ce n'est pas un service de paris —
+     nous ne prenons aucune mise et ne garantissons aucun gain. Joue de façon responsable.</p>
+</footer>
+
+<div id="modal-auth" class="modal hidden">
+  <div class="modal-card">
+    <button class="modal-close" id="modal-close">×</button>
+    <h3 id="modal-title">Se connecter</h3>
+    <input type="email" id="input-email" placeholder="Adresse email">
+    <input type="password" id="input-password" placeholder="Mot de passe">
+    <button id="modal-submit" class="btn-solid full">Continuer</button>
+    <p class="modal-error" id="modal-error"></p>
+  </div>
+</div>
+
+<script type="module" src="js/firebase-config.js"></script>
+<script type="module" src="js/probability-engine.js"></script>
+<script type="module" src="js/matches.js"></script>
+<script type="module" src="js/payment.js"></script>
+<script type="module" src="js/auth.js"></script>
+<script type="module" src="js/app.js"></script>
+</body>
+  </html>
