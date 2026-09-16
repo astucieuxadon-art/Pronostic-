@@ -1,26 +1,39 @@
 import { calcProbabilities, bestPick, buildCombo } from "./probability-engine.js";
 
-const FOOTBALL_API_KEY = "REMPLACE_MOI";
+const FOOTBALL_API_KEY = "86fb4bd3b00347fea5ffe4879602b359";
 const FOOTBALL_API_BASE = "https://api.football-data.org/v4";
-const COMPETITIONS = ["SA", "PL", "PD", "SA_BR", "CL"];
+
+// Compétitions couvertes par le plan gratuit football-data.org
+const COMPETITIONS = ["PL", "PD", "SA", "BL1", "FL1", "CL"];
+// PL = Premier League, PD = Liga, SA = Serie A, BL1 = Bundesliga, FL1 = Ligue 1, CL = Champions League
 
 async function fetchTodayMatches() {
-  if (FOOTBALL_API_KEY === "REMPLACE_MOI") {
-    return getDemoMatches();
-  }
   try {
     const today = new Date().toISOString().slice(0, 10);
-    const res = await fetch(`${FOOTBALL_API_BASE}/matches?dateFrom=${today}&dateTo=${today}`, {
-      headers: { "X-Auth-Token": FOOTBALL_API_KEY }
-    });
-    const data = await res.json();
-    return (data.matches || []).map(m => ({
-      home: m.homeTeam.name,
-      away: m.awayTeam.name,
-      competition: m.competition.name,
-      homeStats: demoStatsFor(m.homeTeam.name),
-      awayStats: demoStatsFor(m.awayTeam.name)
-    }));
+    const allMatches = [];
+
+    for (const comp of COMPETITIONS) {
+      try {
+        const res = await fetch(`${FOOTBALL_API_BASE}/competitions/${comp}/matches?dateFrom=${today}&dateTo=${today}`, {
+          headers: { "X-Auth-Token": FOOTBALL_API_KEY }
+        });
+        if (!res.ok) continue;
+        const data = await res.json();
+        (data.matches || []).forEach(m => {
+          allMatches.push({
+            home: m.homeTeam.name,
+            away: m.awayTeam.name,
+            competition: m.competition.name,
+            homeStats: demoStatsFor(),
+            awayStats: demoStatsFor()
+          });
+        });
+      } catch (e) {
+        console.error(`Erreur pour ${comp} :`, e);
+      }
+    }
+
+    return allMatches.length > 0 ? allMatches : getDemoMatches();
   } catch (e) {
     console.error("Erreur récupération matchs :", e);
     return getDemoMatches();
@@ -29,28 +42,24 @@ async function fetchTodayMatches() {
 
 function getDemoMatches() {
   return [
-    { home: "Al-Hilal", away: "Al-Nassr", competition: "Saudi Pro League",
+    { home: "Al-Hilal", away: "Al-Nassr", competition: "Saudi Pro League (démo)",
       homeStats: { formPoints5: 12, goalsForAvg: 2.4, goalsAgainstAvg: 0.8 },
       awayStats: { formPoints5: 9, goalsForAvg: 2.0, goalsAgainstAvg: 1.2 } },
-    { home: "Man City", away: "Everton", competition: "Premier League",
+    { home: "Man City", away: "Everton", competition: "Premier League (démo)",
       homeStats: { formPoints5: 13, goalsForAvg: 2.6, goalsAgainstAvg: 0.7 },
       awayStats: { formPoints5: 5, goalsForAvg: 0.9, goalsAgainstAvg: 1.8 } },
-    { home: "Flamengo", away: "Bahia", competition: "Brasileirão",
+    { home: "Flamengo", away: "Bahia", competition: "Brasileirão (démo)",
       homeStats: { formPoints5: 10, goalsForAvg: 1.8, goalsAgainstAvg: 1.0 },
-      awayStats: { formPoints5: 6, goalsForAvg: 1.1, goalsAgainstAvg: 1.5 } },
-    { home: "Al Ahly", away: "Zamalek", competition: "Égypte D1",
-      homeStats: { formPoints5: 11, goalsForAvg: 1.9, goalsAgainstAvg: 0.9 },
-      awayStats: { formPoints5: 8, goalsForAvg: 1.3, goalsAgainstAvg: 1.1 } },
-    { home: "Real Madrid", away: "Alavés", competition: "La Liga",
-      homeStats: { formPoints5: 12, goalsForAvg: 2.3, goalsAgainstAvg: 0.8 },
-      awayStats: { formPoints5: 4, goalsForAvg: 0.8, goalsAgainstAvg: 1.9 } },
-    { home: "Inter Miami", away: "Orlando City", competition: "MLS",
-      homeStats: { formPoints5: 9, goalsForAvg: 1.9, goalsAgainstAvg: 1.2 },
-      awayStats: { formPoints5: 7, goalsForAvg: 1.4, goalsAgainstAvg: 1.4 } }
+      awayStats: { formPoints5: 6, goalsForAvg: 1.1, goalsAgainstAvg: 1.5 } }
   ];
+  // Ces matchs de démo n'apparaissent que si l'API ne renvoie aucun match réel
+  // aujourd'hui (jour sans matchs dans ces championnats, ou clé API en attente d'activation).
 }
 
 function demoStatsFor() {
+  // Le plan gratuit football-data.org ne fournit pas les stats de forme dans cet appel.
+  // En attendant un appel enrichi (voir README pour l'évolution), on utilise une estimation
+  // aléatoire raisonnable — les vrais noms d'équipes et matchs restent bien réels.
   return { formPoints5: 7 + Math.floor(Math.random() * 6), goalsForAvg: 1 + Math.random(), goalsAgainstAvg: 1 + Math.random() };
 }
 
@@ -99,4 +108,4 @@ export function renderCombo(combo) {
   document.getElementById("hero-date").textContent = new Date().toLocaleDateString("fr-FR", {
     weekday: "long", day: "numeric", month: "long"
   });
-    }
+        }
